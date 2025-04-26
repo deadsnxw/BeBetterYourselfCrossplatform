@@ -1,9 +1,10 @@
 require('dotenv').config();
-
 const express = require('express');
 const { Pool } = require('pg');
+const jwt = require('jsonwebtoken');
+
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 5005;
 
 app.use(express.json());
 
@@ -47,7 +48,13 @@ app.post('/api/login', async (req, res) => {
             [email, password]
         );
         if (result.rows.length > 0) {
-            res.json({ success: true, user: result.rows[0] });
+            const user = result.rows[0];
+            const token = jwt.sign(
+                { id: user.id, email: user.email },
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+            res.json({ success: true, token, user });
         } else {
             res.status(401).json({ success: false, message: 'Invalid credentials' });
         }

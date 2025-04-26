@@ -1,57 +1,50 @@
-import {StatusBar} from 'expo-status-bar';
-import {StyleSheet, Text, View} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import React, { useEffect, useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import RegisterScreen from "./screens/RegisterScreen";
-import LoginScreen from "./screens/LoginScreen";
-import HomeScreen from "./screens/HomeScreen";
-import {useEffect, useState} from "react";
+import RegisterScreen from './screens/RegisterScreen';
+import LoginScreen from './screens/LoginScreen';
+import HomeScreen from './screens/HomeScreen';
 
 const Stack = createStackNavigator();
+
 export default function App() {
     const [userToken, setUserToken] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const checkToken = async () => {
+        (async () => {
             const token = await AsyncStorage.getItem('userToken');
             setUserToken(token);
-        };
-
-        checkToken();
+            setIsLoading(false);
+        })();
     }, []);
+
+    if (isLoading) {
+        return null;
+    }
 
     return (
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 {userToken ? (
-                    <Stack.Screen
-                        name='Home'
-                        component={HomeScreen}
-                    />
+                    <Stack.Screen name="Home">
+                        {props => (
+                            <HomeScreen {...props} setUserToken={setUserToken} />
+                        )}
+                    </Stack.Screen>
                 ) : (
                     <>
-                        <Stack.Screen
-                            name='Register'
-                            component={RegisterScreen}
-                        />
-                        <Stack.Screen
-                            name='Login'
-                            component={LoginScreen}
-                        />
+                        <Stack.Screen name="Register" component={RegisterScreen} />
+                        <Stack.Screen name="Login">
+                            {props => (
+                                <LoginScreen {...props} setUserToken={setUserToken} />
+                            )}
+                        </Stack.Screen>
                     </>
                 )}
             </Stack.Navigator>
         </NavigationContainer>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-});

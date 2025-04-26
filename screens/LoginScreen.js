@@ -1,29 +1,36 @@
-import React, {useState} from 'react';
-import {View, Text, TextInput, Button, StyleSheet, TouchableOpacity} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useState } from 'react';
+import {
+    View,
+    Text,
+    TextInput,
+    Button,
+    StyleSheet,
+    TouchableOpacity,
+    Platform
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation, setUserToken }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const navigation = useNavigation();
+
+    const HOST = "http://192.168.0.108:5005";
 
     const handleLogin = async () => {
         try {
-            const res = await fetch('http://192.168.0.112:5005/api/login', {
+            const res = await fetch(`${HOST}/api/login`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
             });
 
             const data = await res.json();
+            console.log('Login response:', data);
 
             if (data.success) {
                 await AsyncStorage.setItem('userToken', data.token);
-                console.log('Login successful:', data);
-                navigation.navigate('Home');
+                setUserToken(data.token);
+                navigation.replace('Home');
             } else {
                 console.error('Login failed:', data.message);
             }
@@ -32,26 +39,25 @@ export default function LoginScreen() {
         }
     };
 
-
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Login</Text>
             <TextInput
-                placeholder='Email'
+                placeholder="Email"
                 onChangeText={setEmail}
                 value={email}
                 style={styles.input}
             />
             <TextInput
-                placeholder='Password'
+                placeholder="Password"
                 secureTextEntry
                 onChangeText={setPassword}
                 value={password}
                 style={styles.input}
             />
-            <Button title={"Login"} onPress={handleLogin}/>
+            <Button title="Login" onPress={handleLogin} />
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                <Text style={styles.navigateToLog}>Don't have an account ?</Text>
+                <Text style={styles.navigateToLog}>Don't have an account?</Text>
             </TouchableOpacity>
         </View>
     );
