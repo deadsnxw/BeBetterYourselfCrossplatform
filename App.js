@@ -11,19 +11,13 @@ const Stack = createStackNavigator();
 
 export default function App() {
     const [userToken, setUserToken] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         (async () => {
             const token = await AsyncStorage.getItem('userToken');
             setUserToken(token);
-            setIsLoading(false);
         })();
     }, []);
-
-    if (isLoading) {
-        return null;
-    }
 
     return (
         <NavigationContainer>
