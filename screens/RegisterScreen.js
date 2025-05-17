@@ -9,6 +9,8 @@ export default function RegisterScreen() {
     const [error, setError] = useState(null);
     const navigation = useNavigation();
 
+    const HOST = "http://192.168.0.114:5005";
+
     const validateInputs = () => {
         if (!username || !email || !password) {
             setError('All fields are required');
@@ -33,7 +35,7 @@ export default function RegisterScreen() {
     const handleRegister = () => {
         if (!validateInputs()) return;
 
-        fetch('http://192.168.0.112:4687/api/register', {
+        fetch(`${HOST}/api/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, email, password }),

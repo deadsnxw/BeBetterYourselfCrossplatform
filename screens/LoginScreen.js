@@ -14,7 +14,7 @@ export default function LoginScreen({ navigation, setUserToken }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const HOST = "http://192.168.0.108:5005";
+    const HOST = "http://192.168.0.114:5005";
 
     const handleLogin = async () => {
         try {
@@ -30,7 +30,6 @@ export default function LoginScreen({ navigation, setUserToken }) {
             if (data.success) {
                 await AsyncStorage.setItem('userToken', data.token);
                 setUserToken(data.token);
-                navigation.replace('Home');
             } else {
                 console.error('Login failed:', data.message);
             }
